@@ -1,0 +1,5 @@
+{
+  "function1": "function(x) { return x * x; }",
+  "function2": "function(x) { return x + 10; }",
+  "interval": 100
+}
