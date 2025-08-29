@@ -32,7 +32,7 @@ import jakarta.annotation.PreDestroy;
  * Принципы:
  *  - Есть общий таймаут (TIMEOUT_MS). По истечении таймаута возвращаем ошибку.
  *  - Для Python используем пул потоков, чтобы не блокировать главный поток приложения.
- *  - Для JS создаём engine внутри вызывающего потока (без глобального shared engine),
+ *  - Для JS создаём engine внутри вызывающего потока,
  *    чтобы избежать проблем конкурентного доступа и глобальных Bindings.
  *
  * Поля:
@@ -136,7 +136,6 @@ public class FunctionExecutor {
      * @return ExecutionResult
      */
     public ExecutionResult executePython(String funcText, int x) {
-        // offload blocking work в pythonPool
         Future<ExecutionResult> f = pythonPool.submit(() -> runPythonProcess(funcText, x));
         try {
             return f.get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
@@ -206,7 +205,7 @@ public class FunctionExecutor {
 
     /**
      * Копирует InputStream в ByteArrayOutputStream в отдельном потоке.
-     * Возвращает поток (Thread), который запущен и читает данные.
+     * Возвращает поток, который запущен и читает данные.
      */
     private Thread streamTo(InputStream in, ByteArrayOutputStream baos) {
         Thread t = new Thread(() -> {
